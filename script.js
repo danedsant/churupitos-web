@@ -1,23 +1,37 @@
-
 let tasas = {
   usdBcv: 0,
   eurBcv: 0,
   usdt: 0
 };
 
+// Inputs
 const inputUsd = document.getElementById('usd-input');
 const inputEur = document.getElementById('eur-input');
 const inputUsdt = document.getElementById('usdt-input');
 const inputVes = document.getElementById('ves-input');
+
+// Elementos de Tasa en vivo por tarjeta
+const rateUsd = document.getElementById('rate-usd');
+const rateEur = document.getElementById('rate-eur');
+const rateUsdt = document.getElementById('rate-usdt');
+const rateSpread = document.getElementById('rate-spread');
+
+// Estado API y Cabecera
 const estadoApi = document.getElementById('estado-api');
 const estadoBadge = document.getElementById('estado-badge');
 const estadoBadgeText = document.getElementById('estado-badge-text');
 const estadoWeekday = document.getElementById('estado-weekday');
 const estadoDay = document.getElementById('estado-day');
 const estadoMeta = document.getElementById('estado-meta');
+const refreshBtn = document.getElementById('refresh-btn');
+
+// Toast
 const toast = document.getElementById('toast');
 const toastText = document.getElementById('toast-text');
 const UMBRAL_OBSOLETO_MS = 3 * 60 * 60 * 1000;
+
+let inputsHabilitados = false;
+let toastTimeout = null;
 
 function formatearHace(fecha) {
   const rtf = new Intl.RelativeTimeFormat('es', { numeric: 'auto' });
@@ -37,13 +51,15 @@ function formatearHace(fecha) {
 }
 
 function parseValorFormateado(str) {
-  const normalizado = str.replace(/\./g, '').replace(',', '.');
+  if (!str) return 0;
+  const normalizado = String(str).replace(/\./g, '').replace(',', '.');
   const value = parseFloat(normalizado);
   return Number.isFinite(value) ? value : 0;
 }
 
 function formatearMiles(raw) {
-  const [intParte, decParte] = raw.split(',');
+  if (!raw && raw !== 0) return '';
+  const [intParte, decParte] = String(raw).split(',');
   const intFormateado = intParte.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
   return decParte !== undefined ? `${intFormateado},${decParte}` : intFormateado;
 }
@@ -79,7 +95,7 @@ function sanitizarEntrada(valor, esBorrado) {
 }
 
 function escribirFormateado(numero) {
-  return formatearMiles(numero.toFixed(2).replace('.', ','));
+  return formatearMiles(Number(numero).toFixed(2).replace('.', ','));
 }
 
 function manejarEntrada(e) {
@@ -114,45 +130,41 @@ function manejarEntrada(e) {
 
 function actualizarDesdeInput(inputId) {
   const inputActual = document.getElementById(inputId);
+  if (!inputActual) return;
   const valorActual = parseValorFormateado(inputActual.value);
 
   let ves = 0;
 
   if (inputId === 'usd-input') {
     ves = valorActual * tasas.usdBcv;
-  }
-
-  if (inputId === 'eur-input') {
+  } else if (inputId === 'eur-input') {
     ves = valorActual * tasas.eurBcv;
-  }
-
-  if (inputId === 'usdt-input') {
+  } else if (inputId === 'usdt-input') {
     ves = valorActual * tasas.usdt;
-  }
-
-  if (inputId === 'ves-input') {
+  } else if (inputId === 'ves-input') {
     ves = valorActual;
   }
 
-  if (inputId !== 'ves-input') {
+  if (inputId !== 'ves-input' && inputVes) {
     inputVes.value = escribirFormateado(ves);
   }
 
-  if (inputId !== 'usd-input') {
+  if (inputId !== 'usd-input' && inputUsd && tasas.usdBcv > 0) {
     inputUsd.value = escribirFormateado(ves / tasas.usdBcv);
   }
 
-  if (inputId !== 'eur-input') {
+  if (inputId !== 'eur-input' && inputEur && tasas.eurBcv > 0) {
     inputEur.value = escribirFormateado(ves / tasas.eurBcv);
   }
 
-  if (inputId !== 'usdt-input') {
+  if (inputId !== 'usdt-input' && inputUsdt && tasas.usdt > 0) {
     inputUsdt.value = escribirFormateado(ves / tasas.usdt);
   }
 }
 
 function ajustarCantidad(inputId, cambio) {
   const inputActual = document.getElementById(inputId);
+  if (!inputActual) return;
   const valorActual = parseValorFormateado(inputActual.value);
   const nuevoValor = Math.max(0, valorActual + cambio);
 
@@ -161,14 +173,14 @@ function ajustarCantidad(inputId, cambio) {
 }
 
 function reiniciarAnimacion(elemento, clase) {
+  if (!elemento) return;
   elemento.classList.remove(clase);
   void elemento.offsetWidth;
   elemento.classList.add(clase);
 }
 
-let toastTimeout = null;
-
 function mostrarToast(texto, esError = false) {
+  if (!toast || !toastText) return;
   toastText.textContent = texto;
   toast.classList.toggle('toast--error', esError);
   toast.classList.add('toast--visible');
@@ -179,24 +191,35 @@ function mostrarToast(texto, esError = false) {
 }
 
 function actualizarEstadoApi({ badge, weekday, day, meta, variant }) {
-  estadoBadgeText.textContent = badge;
-  estadoWeekday.textContent = weekday;
-  estadoDay.textContent = day;
-  estadoMeta.textContent = meta;
-  estadoBadge.className = `api-status__badge api-status__badge--${variant}`;
-  estadoDay.classList.remove('api-status__date-line--loading');
-  reiniciarAnimacion(estadoBadge, 'api-status__badge--pop');
-  reiniciarAnimacion(estadoApi, 'api-status__date--fade');
+  if (estadoBadgeText) estadoBadgeText.textContent = badge;
+  if (estadoWeekday) estadoWeekday.textContent = weekday;
+  if (estadoDay) estadoDay.textContent = day;
+  if (estadoMeta) estadoMeta.textContent = meta;
+
+  if (estadoBadge) {
+    estadoBadge.className = `status-dot api-status__badge--${variant}`;
+    reiniciarAnimacion(estadoBadge, 'api-status__badge--pop');
+  }
+
+  if (estadoDay) {
+    estadoDay.classList.remove('api-status__date-line--loading');
+  }
+
+  if (estadoApi) {
+    reiniciarAnimacion(estadoApi, 'api-status__date--fade');
+  }
 }
 
 function reiniciarCampo(inputId) {
   const inputActual = document.getElementById(inputId);
+  if (!inputActual) return;
   inputActual.value = escribirFormateado(1);
   actualizarDesdeInput(inputId);
 }
 
 async function copiarInput(inputId) {
   const inputActual = document.getElementById(inputId);
+  if (!inputActual) return;
   const boton = document.querySelector(`[data-input="${inputId}"][data-action="copy"]`);
   const texto = String(parseValorFormateado(inputActual.value));
 
@@ -205,7 +228,7 @@ async function copiarInput(inputId) {
     try {
       await navigator.clipboard.writeText(texto);
       copiado = true;
-    } catch (error) {
+    } catch {
       copiado = false;
     }
   }
@@ -236,7 +259,7 @@ async function copiarInput(inputId) {
     }, 1500);
   }
 
-  mostrarToast(copiado ? 'Copiado' : 'No se pudo copiar', !copiado);
+  mostrarToast(copiado ? 'Copiado al portapapeles' : 'No se pudo copiar', !copiado);
 }
 
 async function obtenerTasas() {
@@ -250,6 +273,20 @@ async function obtenerTasas() {
       tasas.usdBcv = json.data.usdBcv;
       tasas.eurBcv = json.data.eurBcv;
       tasas.usdt = json.data.usdt;
+
+      // Actualizar badges de tasa en vivo en cada tarjeta
+      if (rateUsd) rateUsd.textContent = `Tasa: Bs. ${escribirFormateado(tasas.usdBcv)}`;
+      if (rateEur) rateEur.textContent = `Tasa: Bs. ${escribirFormateado(tasas.eurBcv)}`;
+      if (rateUsdt) {
+        const brecha = tasas.usdBcv > 0 ? ((tasas.usdt - tasas.usdBcv) / tasas.usdBcv) * 100 : 0;
+        const signo = brecha >= 0 ? '+' : '';
+        rateUsdt.textContent = `Tasa: Bs. ${escribirFormateado(tasas.usdt)} (${signo}${brecha.toFixed(1)}%)`;
+      }
+      if (rateSpread) {
+        const brecha = tasas.usdBcv > 0 ? ((tasas.usdt - tasas.usdBcv) / tasas.usdBcv) * 100 : 0;
+        const signo = brecha >= 0 ? '+' : '';
+        rateSpread.textContent = `Brecha USDT: ${signo}${brecha.toFixed(1)}%`;
+      }
 
       const lastUpdate = new Date(json.last_update);
 
@@ -274,12 +311,12 @@ async function obtenerTasas() {
       inicializarCalculadora();
       habilitarInputs();
     } else {
-      throw new Error('La API no devuelve exito');
+      throw new Error('La API no devuelve éxito');
     }
   } catch (error) {
     console.error('Error al obtener tasas:', error);
     actualizarEstadoApi({
-      badge: 'Error',
+      badge: 'Sin conexión',
       weekday: '',
       day: 'No se pudo conectar con la API',
       meta: '',
@@ -289,19 +326,34 @@ async function obtenerTasas() {
 }
 
 function inicializarCalculadora() {
+  if (tasas.usdBcv <= 0) return;
   const valorBaseVes = 1 * tasas.usdBcv;
 
-  inputUsd.value = escribirFormateado(1);
-  inputVes.value = escribirFormateado(valorBaseVes);
-  inputEur.value = escribirFormateado(valorBaseVes / tasas.eurBcv);
-  inputUsdt.value = escribirFormateado(valorBaseVes / tasas.usdt);
+  if (inputUsd) inputUsd.value = escribirFormateado(1);
+  if (inputVes) inputVes.value = escribirFormateado(valorBaseVes);
+  if (inputEur && tasas.eurBcv > 0) inputEur.value = escribirFormateado(valorBaseVes / tasas.eurBcv);
+  if (inputUsdt && tasas.usdt > 0) inputUsdt.value = escribirFormateado(valorBaseVes / tasas.usdt);
 }
 
 function habilitarInputs() {
-  inputUsd.addEventListener('input', manejarEntrada);
-  inputUsdt.addEventListener('input', manejarEntrada);
-  inputVes.addEventListener('input', manejarEntrada);
-  inputEur.addEventListener('input', manejarEntrada);
+  if (inputsHabilitados) return;
+  inputsHabilitados = true;
+
+  [inputUsd, inputUsdt, inputVes, inputEur].forEach((input) => {
+    if (!input) return;
+    input.addEventListener('input', manejarEntrada);
+
+    // Navegación accesible por teclado (Flechas Arriba/Abajo para subir/bajar)
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        ajustarCantidad(input.id, 1);
+      } else if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        ajustarCantidad(input.id, -1);
+      }
+    });
+  });
 
   document.querySelectorAll('.icon-btn').forEach((button) => {
     button.addEventListener('click', () => {
@@ -310,21 +362,30 @@ function habilitarInputs() {
 
       if (action === 'increment') {
         ajustarCantidad(inputId, 1);
-      }
-
-      if (action === 'decrement') {
+      } else if (action === 'decrement') {
         ajustarCantidad(inputId, -1);
-      }
-
-      if (action === 'reset') {
+      } else if (action === 'reset') {
         reiniciarCampo(inputId);
-      }
-
-      if (action === 'copy') {
+      } else if (action === 'copy') {
         copiarInput(inputId);
       }
     });
   });
+
+  // Botón de recargar tasas manual
+  if (refreshBtn) {
+    refreshBtn.addEventListener('click', async () => {
+      refreshBtn.classList.add('refresh-btn--spinning');
+      try {
+        await obtenerTasas();
+        mostrarToast('Tasas actualizadas');
+      } catch {
+        mostrarToast('Error al actualizar tasas', true);
+      } finally {
+        setTimeout(() => refreshBtn.classList.remove('refresh-btn--spinning'), 600);
+      }
+    });
+  }
 }
 
 obtenerTasas();
