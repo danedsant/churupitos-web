@@ -1,4 +1,4 @@
-/* ── Fuentes & Variables Semánticas (Tailwind & Shadcn tokens) ── */
+
 @import url('https://fonts.googleapis.com/css2?family=Comfortaa:wght@700&family=Inter:wght@400;500;600;700&display=swap');
 
 :root {
@@ -30,7 +30,7 @@
   --shadow-highlight: 0 12px 36px rgba(0, 0, 0, 0.4), 0 0 24px rgba(16, 185, 129, 0.08);
 }
 
-/* ── Reset & Base ── */
+
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
@@ -57,7 +57,7 @@ body {
   padding: 1.5rem 1rem;
 }
 
-/* ── Layout Principal (Sin enmarcado doble, espacioso y fluido) ── */
+
 .app-layout {
   width: 100%;
   max-width: 520px;
@@ -65,7 +65,7 @@ body {
   flex-direction: column;
 }
 
-/* ── Cabecera ── */
+
 .app-header {
   display: flex;
   align-items: center;
@@ -97,7 +97,6 @@ body {
   font-weight: 400;
 }
 
-/* Botón de Refrescar */
 .refresh-btn {
   width: 40px;
   height: 40px;
@@ -128,14 +127,14 @@ body {
   to { transform: rotate(360deg); }
 }
 
-/* ── Lista de Divisas (Currency List) ── */
+
 .currency-list {
   display: flex;
   flex-direction: column;
-  gap: 1.15rem; /* Espaciado amplio entre cada moneda */
+  gap: 1.15rem; 
 }
 
-/* ── Tarjeta de Moneda (Currency Tile) ── */
+
 .currency-tile {
   background: var(--surface);
   border: 1px solid var(--border);
@@ -152,7 +151,7 @@ body {
   box-shadow: 0 12px 35px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(124, 92, 255, 0.2);
 }
 
-/* Cabecera del Tile */
+
 .currency-tile__header {
   display: flex;
   align-items: center;
@@ -208,7 +207,7 @@ body {
   background: rgba(16, 185, 129, 0.08);
 }
 
-/* Caja de Entrada (Input Box) */
+
 .currency-tile__input-box {
   display: flex;
   align-items: center;
@@ -256,7 +255,7 @@ body {
   color: var(--text-dim);
 }
 
-/* Botonera de Acciones (Actions) */
+
 .currency-tile__actions {
   display: inline-flex;
   align-items: center;
@@ -323,7 +322,7 @@ body {
   background: rgba(61, 255, 163, 0.15) !important;
 }
 
-/* ── Tile Destacado de Bolívares (VES) ── */
+
 .currency-tile--highlight {
   background: linear-gradient(180deg, rgba(16, 185, 129, 0.08) 0%, rgba(255, 255, 255, 0.02) 100%);
   border: 1px solid var(--border-highlight);
@@ -341,7 +340,7 @@ body {
   color: #ffffff;
 }
 
-/* ── Barra de Estado Integrada (Footer Status Bar) ── */
+
 .status-bar {
   margin-top: 1.5rem;
   display: flex;
@@ -415,7 +414,7 @@ body {
   50% { opacity: 0.4; transform: scale(0.9); }
 }
 
-/* ── Toast de Copiado ── */
+
 .toast {
   position: fixed;
   bottom: 2rem;
@@ -455,7 +454,7 @@ body {
   fill: var(--error);
 }
 
-/* ── Utilidades de Accesibilidad y Foco ── */
+
 .visually-hidden {
   position: absolute;
   width: 1px;
@@ -473,7 +472,7 @@ body {
   outline-offset: 2px;
 }
 
-/* ── Media Queries (Ergonomía Móvil) ── */
+
 @media (max-width: 480px) {
   body {
     padding: 1rem 0.75rem;
@@ -490,7 +489,7 @@ body {
 
   .icon-btn {
     width: 38px;
-    height: 38px; /* Target táctil óptimo */
+    height: 38px; 
   }
 
   .status-bar {
@@ -500,7 +499,7 @@ body {
   }
 }
 
-/* ── Preferencia de Movimiento Reducido (WCAG) ── */
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;

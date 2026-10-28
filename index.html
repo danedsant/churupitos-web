@@ -7,13 +7,12 @@
     <meta name="description" content="Calculadora de divisas instantánea para Venezuela. Convierte dólares (USD), euros (EUR) y USDT a bolívares (VES) con tasas oficiales del BCV y Binance P2P actualizadas.">
     <meta name="theme-color" content="#0b0c10">
     
-    <!-- Open Graph / Redes Sociales -->
     <meta property="og:type" content="website">
     <meta property="og:title" content="Churupitos · Calculadora de Divisas BCV y Binance">
     <meta property="og:description" content="Conversión rápida y precisa entre Dólar BCV, Euro, USDT y Bolívares. Tasas en tiempo real.">
     <meta property="og:locale" content="es_VE">
     
-    <!-- Tipografía -->
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -21,7 +20,7 @@
     <link rel="stylesheet" href="style.css">
     <script src="script.js" defer></script>
     
-    <!-- Vercel Web Analytics -->
+   
     <script>
       window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
     </script>
@@ -29,7 +28,7 @@
 </head>
 <body>
   <main class="app-layout">
-    <!-- Cabecera -->
+
     <header class="app-header">
       <div class="brand">
         <h1 class="brand-title">
@@ -48,10 +47,9 @@
       </button>
     </header>
 
-    <!-- Lista Espaciosa de Divisas -->
     <section class="currency-list" aria-label="Campos de conversión de divisas">
       
-      <!-- USD: Dólar BCV -->
+     
       <article class="currency-tile" id="tile-usd">
         <div class="currency-tile__header">
           <div class="currency-tile__label-group">
@@ -80,7 +78,7 @@
         </div>
       </article>
 
-      <!-- EUR: Euro BCV -->
+   
       <article class="currency-tile" id="tile-eur">
         <div class="currency-tile__header">
           <div class="currency-tile__label-group">
@@ -109,7 +107,7 @@
         </div>
       </article>
 
-      <!-- USDT: Binance P2P -->
+      
       <article class="currency-tile" id="tile-usdt">
         <div class="currency-tile__header">
           <div class="currency-tile__label-group">
@@ -160,7 +158,7 @@
 
     </section>
 
-    <!-- Barra de Estado Integrada (Footer) -->
+   
     <footer class="status-bar" role="status" aria-live="polite">
       <div class="status-bar__left">
         <span class="status-dot status-dot--loading" id="estado-badge" aria-hidden="true"></span>
@@ -175,7 +173,7 @@
     </footer>
   </main>
 
-  <!-- Notificación Toast de copiado -->
+  
   <div class="toast" id="toast" role="status" aria-live="polite">
     <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0z"/></svg>
     <span id="toast-text">Copiado</span>

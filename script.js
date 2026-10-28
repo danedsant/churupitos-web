@@ -4,19 +4,19 @@ let tasas = {
   usdt: 0
 };
 
-// Inputs
+
 const inputUsd = document.getElementById('usd-input');
 const inputEur = document.getElementById('eur-input');
 const inputUsdt = document.getElementById('usdt-input');
 const inputVes = document.getElementById('ves-input');
 
-// Elementos de Tasa en vivo por tarjeta
+
 const rateUsd = document.getElementById('rate-usd');
 const rateEur = document.getElementById('rate-eur');
 const rateUsdt = document.getElementById('rate-usdt');
 const rateSpread = document.getElementById('rate-spread');
 
-// Estado API y Cabecera
+
 const estadoApi = document.getElementById('estado-api');
 const estadoBadge = document.getElementById('estado-badge');
 const estadoBadgeText = document.getElementById('estado-badge-text');
@@ -25,7 +25,7 @@ const estadoDay = document.getElementById('estado-day');
 const estadoMeta = document.getElementById('estado-meta');
 const refreshBtn = document.getElementById('refresh-btn');
 
-// Toast
+
 const toast = document.getElementById('toast');
 const toastText = document.getElementById('toast-text');
 const UMBRAL_OBSOLETO_MS = 3 * 60 * 60 * 1000;
@@ -343,7 +343,7 @@ function habilitarInputs() {
     if (!input) return;
     input.addEventListener('input', manejarEntrada);
 
-    // Navegación accesible por teclado (Flechas Arriba/Abajo para subir/bajar)
+    
     input.addEventListener('keydown', (e) => {
       if (e.key === 'ArrowUp') {
         e.preventDefault();
@@ -372,7 +372,7 @@ function habilitarInputs() {
     });
   });
 
-  // Botón de recargar tasas manual
+ 
   if (refreshBtn) {
     refreshBtn.addEventListener('click', async () => {
       refreshBtn.classList.add('refresh-btn--spinning');
